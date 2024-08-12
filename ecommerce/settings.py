@@ -46,10 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'tailwind',
+    'theme',
     'users',
     'shops',
     'orders',
 ]
+
+TAILWIND_APP_NAME = 'theme'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -140,9 +144,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'  # URL to use when referring to static files located in STATIC_ROOT
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Additional locations the staticfiles app will traverse
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # The absolute path to the directory where collectstatic will collect static files
+
+# Media files (Uploaded by users)
+MEDIA_URL = '/media/'  # URL to handle the media served from MEDIA_ROOT
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # The absolute path to the directory where media files are stored
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'login/'
+
+AUTH_USER_MODEL = 'users.User'
+

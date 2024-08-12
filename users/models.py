@@ -1,7 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-class User(models.Model):
+class User(AbstractUser, models.Model):
     ROLE_CHOICES = [
         ('Admin', 'Admin'),
         ('Shop Owner', 'Shop Owner'),
@@ -13,3 +14,6 @@ class User(models.Model):
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     phone_number = models.CharField(max_length=15)
     address = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True,
+                                        default='profile_pics/default.png')
+
