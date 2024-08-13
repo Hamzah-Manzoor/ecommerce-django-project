@@ -49,10 +49,11 @@
 
     <h3>The image from media file is:</h3>
     {% if user.profile_picture %}
-        <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+        <img src="{% url 'serve_protected_media' user.profile_picture.name %}" alt="Profile Picture">
     {% else %}
         <img src="{% static 'profile_pics/default.png' %}" alt="Default Profile Picture">
     {% endif %}
+
 
 
 
@@ -118,6 +119,119 @@
                     <a href="{% url 'order_edit' order.id %}">Edit</a>
                     <a href="{% url 'order_delete' order.id %}">Delete</a>
                 </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <h1>Orders Overview</h1>
+
+    <!-- Query 1: Total orders per customer -->
+    <h2>Total Orders Per Customer</h2>
+    <p>Query: Order.objects.values('customer__username').annotate(total_orders=Count('id'))</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Total Orders</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in total_orders_per_customer %}
+            <tr>
+                <td>{{ result.customer__username }}</td>
+                <td>{{ result.total_orders }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Query 2: Total amount spent per shop, for orders with status 'Delivered' -->
+    <h2>Total Amount Spent Per Shop (Delivered Orders)</h2>
+    <p>Query: Order.objects.filter(order_status='Delivered').values('shop__name').annotate(total_spent=Sum('total_amount'))</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Shop</th>
+                <th>Total Spent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in total_spent_per_shop %}
+            <tr>
+                <td>{{ result.shop__name }}</td>
+                <td>{{ result.total_spent }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Query 3: Average order amount for each customer, grouped by shop -->
+    <h2>Average Order Amount Per Customer Per Shop</h2>
+    <p>Query: Order.objects.values('customer__username', 'shop__name').annotate(avg_amount=Avg('total_amount'))</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Shop</th>
+                <th>Average Order Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in avg_order_amount_per_customer_per_shop %}
+            <tr>
+                <td>{{ result.customer__username }}</td>
+                <td>{{ result.shop__name }}</td>
+                <td>{{ result.avg_amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Query 4: Number of 'Pending' orders per shop -->
+    <h2>Number of Pending Orders Per Shop</h2>
+    <p>Query: Order.objects.filter(order_status='Pending').values('shop__name').annotate(pending_count=Count('id'))</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Shop</th>
+                <th>Pending Orders</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in pending_orders_per_shop %}
+            <tr>
+                <td>{{ result.shop__name }}</td>
+                <td>{{ result.pending_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Query 5: Orders with total amount greater than the average amount of all orders -->
+    <h2>High Value Orders (Greater than Average)</h2>
+    <p>Query: Order.objects.filter(total_amount__gt=avg_total_amount)</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Shop</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in high_value_orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.customer.username }}</td>
+                <td>{{ order.shop.name }}</td>
+                <td>{{ order.total_amount }}</td>
+                <td>{{ order.order_status }}</td>
+                <td>{{ order.order_date }}</td>
             </tr>
             {% endfor %}
         </tbody>

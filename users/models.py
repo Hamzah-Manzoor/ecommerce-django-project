@@ -17,3 +17,16 @@ class User(AbstractUser, models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True,
                                         default='profile_pics/default.png')
 
+
+class RequestLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    method = models.CharField(max_length=10)
+    path = models.CharField(max_length=200)
+    status_code = models.IntegerField()
+    duration = models.FloatField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.method} {self.path} {self.status_code}"
+
