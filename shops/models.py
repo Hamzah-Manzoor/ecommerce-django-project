@@ -4,7 +4,7 @@ from users.models import User
 
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'Shop Owner'})
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     location = models.TextField()
     contact_number = models.CharField(max_length=15)
 
